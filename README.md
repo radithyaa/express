@@ -68,16 +68,19 @@ Starter pack backend Express.js yang lengkap dengan sistem autentikasi JWT dan M
    ```env
    NODE_ENV=development
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/express-jwt-starter
+   MONGODB_URI=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/express-jwt-starter?retryWrites=true&w=majority
    JWT_SECRET=your-super-secret-jwt-key
    JWT_REFRESH_SECRET=your-super-secret-refresh-key
    # ... dan lainnya
    ```
 
-4. **Start MongoDB**
-   Pastikan MongoDB berjalan di sistem Anda
+4. **Setup MongoDB Database**
+   - Buat akun gratis di [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+   - Buat cluster baru
+   - Dapatkan connection string dan update `MONGODB_URI` di file `.env`
+   - Whitelist IP address Anda di Network Access
+   - Buat database user di Database Access
 
-5. **Run the application**
    ```bash
    # Development mode
    npm run dev
