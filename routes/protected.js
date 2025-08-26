@@ -1,67 +1,29 @@
 const express = require('express');
-const { authenticate, authorize, optionalAuth } = require('../middleware/auth');
+const ProtectedController = require('../controllers/ProtectedController');
+const AuthMiddleware = require('../middleware/AuthMiddleware');
 
 const router = express.Router();
+const protectedController = new ProtectedController();
+const authMiddleware = new AuthMiddleware();
 
 // @route   GET /api/protected/user
 // @desc    Protected route for authenticated users
 // @access  Private
-router.get('/user', authenticate, (req, res) => {
-  res.json({
-    success: true,
-    message: 'This is a protected route for authenticated users',
-    data: {
-      user: req.user,
-      timestamp: new Date().toISOString()
-    }
-  });
-});
+router.get('/user', authMiddleware.authenticate(), (req, res) => protectedController.userProtectedRoute(req, res));
 
 // @route   GET /api/protected/admin
 // @desc    Protected route for admin users only
 // @access  Private/Admin
-router.get('/admin', authenticate, authorize('admin'), (req, res) => {
-  res.json({
-    success: true,
-    message: 'This is a protected route for admin users only',
-    data: {
-      user: req.user,
-      timestamp: new Date().toISOString()
-    }
-  });
-});
+router.get('/admin', authMiddleware.authenticate(), authMiddleware.authorize('admin'), (req, res) => protectedController.adminProtectedRoute(req, res));
 
 // @route   GET /api/protected/moderator
 // @desc    Protected route for moderators and admins
 // @access  Private/Moderator
-router.get('/moderator', authenticate, authorize('moderator', 'admin'), (req, res) => {
-  res.json({
-    success: true,
-    message: 'This is a protected route for moderators and admins',
-    data: {
-      user: req.user,
-      timestamp: new Date().toISOString()
-    }
-  });
-});
+router.get('/moderator', authMiddleware.authenticate(), authMiddleware.authorize('moderator', 'admin'), (req, res) => protectedController.moderatorProtectedRoute(req, res));
 
 // @route   GET /api/protected/optional
 // @desc    Route with optional authentication
 // @access  Public/Optional Auth
-router.get('/optional', optionalAuth, (req, res) => {
-  const message = req.user 
-    ? `Hello ${req.user.firstName}, you are authenticated!`
-    : 'Hello guest, you can access this route without authentication';
-
-  res.json({
-    success: true,
-    message,
-    data: {
-      user: req.user || null,
-      isAuthenticated: !!req.user,
-      timestamp: new Date().toISOString()
-    }
-  });
-});
+router.get('/optional', authMiddleware.optionalAuth(), (req, res) => protectedController.optionalAuthRoute(req, res));
 
 module.exports = router;
